@@ -31,6 +31,14 @@
       <artifactId>flink-clients</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- DeliveryGuarantee and the source/sink base classes live here. The Kafka connector pulls it
+         in as `provided`, and it is already on the cluster's classpath, so declare it the same way
+         rather than shading a second copy in. -->
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-connector-base</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Bundled into the job jar. -->
     <dependency>
@@ -57,6 +65,28 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-test-utils</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-streaming-java</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-runtime</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
