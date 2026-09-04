@@ -144,6 +144,14 @@ class RuleConfigValidatorTest {
     }
 
     @Test
+    void modelScoreProbThresholdBelowACoinFlipIsRejected() {
+        RuleConfig config = new RuleConfig(RuleId.MODEL_SCORE, 1, true, 35,
+                Map.of("probThreshold", 0.4), "test", Instant.EPOCH);
+        assertThat(RuleConfigValidator.problems(config))
+                .singleElement().asString().contains("probThreshold must be");
+    }
+
+    @Test
     void supersedesOnlyAcceptsAStrictlyNewerVersionOfTheSameRule() {
         RuleConfig v1 = velocity(goodVelocityParams());
         RuleConfig v2 = v1.withVersion(2);

@@ -64,6 +64,12 @@ public final class RuleConfigValidator {
                 new ParamSpec("largeAmountMinor", 1000, 100_000_000L, true),
                 new ParamSpec("windowSeconds", 10, 3600, true)));
 
+        // Model score: the fixed-coefficient risk model's own output is a probability in [0, 1],
+        // so the only tunable here is where on that scale a hit fires. 0.5 is excluded from the
+        // floor because a cutoff that low would fire on a coin flip.
+        m.put(RuleId.MODEL_SCORE, List.of(
+                new ParamSpec("probThreshold", 0.5, 0.999, false)));
+
         return Map.copyOf(m);
     }
 
@@ -159,6 +165,8 @@ public final class RuleConfigValidator {
                 Map.of("probeCount", 3.0, "probeMaxAmountMinor", 500.0,
                         "largeAmountMinor", 50_000.0, "windowSeconds", 300.0),
                 "bootstrap", null));
+        m.put(RuleId.MODEL_SCORE, new RuleConfig(RuleId.MODEL_SCORE, 1, true, 35,
+                Map.of("probThreshold", 0.75), "bootstrap", null));
         m.values().forEach(RuleConfigValidator::validate);
         return Map.copyOf(m);
     }

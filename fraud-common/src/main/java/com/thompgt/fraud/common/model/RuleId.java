@@ -24,8 +24,11 @@ public final class RuleId {
     /** Several small probing authorisations followed by a large one. */
     public static final String CARD_TESTING = "card_testing";
 
+    /** Fixed-coefficient risk model over transaction features; fires above its probability cutoff. */
+    public static final String MODEL_SCORE = "model_score";
+
     public static final Set<String> ALL =
-            Set.of(VELOCITY, AMOUNT_ANOMALY, GEO_IMPOSSIBLE, CARD_TESTING);
+            Set.of(VELOCITY, AMOUNT_ANOMALY, GEO_IMPOSSIBLE, CARD_TESTING, MODEL_SCORE);
 
     private RuleId() {
     }
