@@ -33,27 +33,28 @@ healthy. *(Met.)*
 
 ---
 
-## Phase 1 — Domain model, contracts and schema
+## Phase 1 — Domain model, contracts and schema ✅
 
-- [ ] **1.1** Finalise the `Transaction` record: id, card, amount (minor units,
+- [x] **1.1** Finalise the `Transaction` record: id, card, amount (minor units,
       integer — never a float for money), currency, merchant, MCC, country,
       device fingerprint, event time.
-- [ ] **1.2** `ScoredTransaction` / `Alert` records: triggered rule ids, score,
+- [x] **1.2** `ScoredTransaction` / `Alert` records: triggered rule ids, score,
       contributing evidence, scoring timestamp.
-- [ ] **1.3** JSON serde in `fraud-common` (Jackson + JSR-310, `Instant` as
+- [x] **1.3** JSON serde in `fraud-common` (Jackson + JSR-310, `Instant` as
       epoch millis) with round-trip tests. One serde used by generator, Flink
       job and API so the wire format cannot drift between them.
-- [ ] **1.4** `RuleConfig` contract — the exact JSON stored at each
+- [x] **1.4** `RuleConfig` contract — the exact JSON stored at each
       `/fraud/rules/<ruleId>` znode, with a `version` field and validation that
       rejects nonsense thresholds rather than letting them reach the job.
-- [ ] **1.5** Postgres schema in `sql/schema/`: `alerts`, `daily_card_agg`,
+- [x] **1.5** Postgres schema in `sql/schema/`: `alerts`, `daily_card_agg`,
       `rule_versions`, `labelled_outcomes`, with indexes for the API access
       patterns. Applied by a versioned migration, not by hand.
-- [ ] **1.6** Kafka topic definitions and a `scripts/create-topics.sh` that is
+- [x] **1.6** Kafka topic definitions and a `scripts/create-topics.sh` that is
       idempotent: `transactions`, `scored-transactions`, `alerts`, plus a DLQ.
 
 **Exit criteria:** `./mvnw test` green; topics and tables created reproducibly
-from scripts.
+from scripts. *(Met — 25 tests; `scripts/apply-schema.sh` and
+`scripts/create-topics.sh` both verified idempotent against the live stack.)*
 
 ---
 

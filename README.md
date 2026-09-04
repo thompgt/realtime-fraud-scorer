@@ -80,10 +80,15 @@ Build the JVM modules:
 - **Kafka has two listeners.** Containers must use `kafka:29092`; the host must
   use `localhost:9092`. Mixing them up produces a connection that appears to
   succeed and then times out.
-- **Git Bash mangles ZooKeeper paths.** `zookeeper-shell ... ls /brokers/ids`
-  fails with `Path must start with / character` because MSYS rewrites the
-  leading slash into a Windows path. Prefix the command with
-  `MSYS_NO_PATHCONV=1`.
+- **Git Bash mangles anything that looks like an absolute path.** MSYS rewrites
+  a leading `/` into a Windows path before the command ever sees it, so
+  `zookeeper-shell ... ls /brokers/ids` fails with `Path must start with /
+  character` and `docker compose exec` arguments arrive as
+  `C:/Program Files/Git/...`. Prefix such commands with `MSYS_NO_PATHCONV=1`.
+  The scripts in `scripts/` already do. Note the reverse trap: with that set,
+  a genuine *host* path (`docker compose -f /c/Users/...`) is no longer
+  translated either, so the scripts `cd` to the repo root instead of passing
+  `-f`.
 - **Kafka runs in ZooKeeper mode deliberately**, not KRaft — ZooKeeper is one of
   the technologies this project is meant to exercise. That pins the broker to
   Confluent Platform 7.6.x (Kafka 3.6), since Kafka 4.0 removes ZooKeeper mode.
