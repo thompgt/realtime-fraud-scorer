@@ -28,14 +28,16 @@ import java.util.Map;
  *
  * <pre>
  *   transactions ──▶ parse ──┬──▶ DLQ (unparseable)
- *                            │
- *                            ▼  watermarks, keyBy cardId
- *                   ┌────────┴────────┐
- *                   │                 │
- *          RuleEvaluator       CardTestingPattern (CEP)
- *      velocity, amount, geo        multi-event
- *                   │                 │
- *                   └──▶ ScoreMerger ◀┘   keyBy transactionId
+ *                            ├──▶ ModelEnricher (stateless, unkeyed) ──┐
+ *                            │                                        │
+ *                            ▼  watermarks, keyBy cardId               │
+ *                   ┌────────┴────────┐                                │
+ *                   │                 │                                │
+ *          RuleEvaluator       CardTestingPattern (CEP)                │
+ *      velocity, amount, geo        multi-event                       │
+ *                   │                 └────────────▶ union ◀──────────┘
+ *                   │                                  │
+ *                   └──────────────▶ ScoreMerger ◀──────┘   keyBy transactionId
  *                            │
  *                            ▼
  *                     ScoredTransaction ──▶ alerts (score >= threshold)
@@ -89,6 +91,12 @@ public final class FraudScoringJob {
                 .name("dlq")
                 .uid("dlq");
 
+        DataStream<KeyedRuleHit> modelHits = parsed
+                .process(new ModelEnricher(rules.get(RuleId.MODEL_SCORE)))
+                .returns(JsonTypeInfo.of(KeyedRuleHit.class))
+                .name("model-enricher")
+                .uid("model-enricher");
+
         KeyedStream<Transaction, String> keyed = parsed
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<Transaction>forBoundedOutOfOrderness(
@@ -113,7 +121,7 @@ public final class FraudScoringJob {
 
         DataStream<ScoredTransaction> scored = evaluated
                 .keyBy(s -> s.transaction().transactionId())
-                .connect(cardTesting.keyBy(KeyedRuleHit::transactionId))
+                .connect(cardTesting.union(modelHits).keyBy(KeyedRuleHit::transactionId))
                 .process(new ScoreMerger(config.mergeGrace().toMillis()))
                 .returns(JsonTypeInfo.of(ScoredTransaction.class))
                 .name("score-merger")
