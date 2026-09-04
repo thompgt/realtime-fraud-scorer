@@ -1,0 +1,26 @@
+# Maven
+target/
+dependency-reduced-pom.xml
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Runtime / local state
+*.log
+logs/
+.env
+docker/volumes/
+airflow/logs/
+airflow/plugins/__pycache__/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

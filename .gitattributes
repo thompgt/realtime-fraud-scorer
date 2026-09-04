@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+# Shell scripts must keep LF endings: a CRLF shebang breaks them under
+# Linux containers and WSL.
+*.sh   text eol=lf
+mvnw   text eol=lf
+*.cmd  text eol=crlf
+
+*.jar  binary
+*.png  binary
